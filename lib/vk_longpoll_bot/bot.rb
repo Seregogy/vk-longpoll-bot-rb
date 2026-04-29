@@ -44,8 +44,8 @@ module VkLongpollBot
     # @param method_name ["String"] name of requested method. See https://vk.com/dev/methods
     #
     # @return [Hash]
-    def api(method_name, parameters = {})
-      Request.api(method_name, parameters, @access_token, @api_version)
+    def api(method_name, parameters = {}, keyboard = nil)
+      Request.api(method_name, parameters, @access_token, @api_version, keyboard)
     end
     
     ##
@@ -57,14 +57,17 @@ module VkLongpollBot
     #   Options +user_id+, +message+ and +random_id+ will be overwritten
     #
     # @return [Hash]
-    def send_message(target, content, options = {})
+    def send_message(target, content, options = {}, keyboard = nil)
       target_id = target.to_i
-      forced_options = {
-        user_id: target_id,
-        message: content,
-        random_id: Utility.random_id(target_id)
-      }
-      api("messages.send", options.merge(forced_options))
+        forced_options = {
+          user_id: target_id,
+          message: content,
+          random_id: Utility.random_id(target_id),
+        }
+      unless keyboard.nil?
+        k = JSON.generate(keyboard)
+      end
+      api("messages.send", options.merge(forced_options), k)
     end
 
     ##
