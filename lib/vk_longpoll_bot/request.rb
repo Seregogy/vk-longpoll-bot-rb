@@ -1,5 +1,6 @@
 require "net/http"
 require "json"
+require "json/pure"
 
 module VkLongpollBot
 
@@ -28,7 +29,9 @@ module VkLongpollBot
     #
     # @return [Hash]
     def self.api(method_name, parameters, access_token, v = VK_API_CURRENT_VERSION)
-      response = JSON.parse self.to("#{VK_API_URL_BASE}/method/#{method_name}?access_token=#{access_token}&v=#{v.to_s}&#{URI.encode_www_form(parameters)}")
+      raw = self.to("#{VK_API_URL_BASE}/method/#{method_name}?access_token=#{access_token}&v=#{v.to_s}&#{URI.encode_www_form(parameters)}")
+      response = JSON.parse(raw)
+      
       if response["response"]
         response["response"]
       elsif response["error"]
@@ -48,7 +51,8 @@ module VkLongpollBot
     #
     # @return [Hash] hash with timestamp of last event and array of updates.
     def self.longpoll(server, key, ts, wait = LONGPOLL_STANDART_WAIT)
-      JSON.parse self.to("#{server}?act=a_check&key=#{key}&ts=#{ts}&wait=#{wait}")
+      raw = self.to("#{server}?act=a_check&key=#{key}&ts=#{ts}&wait=#{wait}")
+      JSON.parse(raw)
     end
   
   end
